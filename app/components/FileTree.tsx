@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { FileTree } from "../lib/buildFileTree";
 import { play } from "../lib/vlcInterface";
 
@@ -28,34 +28,36 @@ export default function FileTree({
 
   // Render the file tree as a nested list with some styling using Tailwind CSS
   return (
-    <ul>
+    <Fragment>
       {fileTree.directories.map((directory) => {
         const key = directory.name;
         return (
-          <li key={key}>
-            <p
+          <Fragment key={key}>
+            <button
               style={{ paddingLeft: `${depth}rem` }}
-              className="text-red-700 hover:bg-red-100 p-1 cursor-pointer"
+              className="w-full text-start p-2 indent-4 border-t text-red-700 hover:bg-red-100 cursor-pointer first:border-t-0"
               onClick={() => setOpened(toggle(key))}
+              data-depth={depth}
             >
               {key}/
-            </p>
+            </button>
             {opened.has(key) && (
               <FileTree fileTree={directory} depth={depth + 1} />
             )}
-          </li>
+          </Fragment>
         );
       })}
       {fileTree.files.map((file) => (
-        <li
+        <button
           key={file.fullpath}
           style={{ paddingLeft: `${depth}rem` }}
-          className={`cursor-pointer hover:bg-red-100`}
+          className="w-full p-2 indent-4 border-t text-start hover:bg-red-100 cursor-pointer first:border-t-0"
           onClick={() => play(file.fullpath)}
+          data-depth={depth}
         >
-          <p className="p-1">{file.name}</p>
-        </li>
+          {file.name}
+        </button>
       ))}
-    </ul>
+    </Fragment>
   );
 }
