@@ -50,13 +50,13 @@ export default function FileTree({
           <Fragment key={key}>
             <p
               style={{ paddingLeft: `${depth}rem` }}
-              className={`flex p-2 indent-4 border-t text-red-700 hover:bg-red-100 cursor-pointer first:border-t-0${
-                directory.isCompleted ? " line-through" : ""
-              }`}
+              className="flex p-2 indent-4 border-t text-red-700 hover:bg-red-100 cursor-pointer first:border-t-0"
               data-depth={depth}
             >
               <button
-                className="flex-auto truncate w-full text-start"
+                className={`flex-auto truncate w-full text-start${
+                  directory.isCompleted ? " line-through" : ""
+                }`}
                 onClick={() => setOpened(toggle(key))}
               >
                 {key}/
@@ -68,7 +68,7 @@ export default function FileTree({
                   directory.isCompleted
                 )}
               >
-                👀
+                {directory.isCompleted ? "🙈" : "👀"}
               </button>
             </p>
             {opened.has(key) && (
@@ -81,13 +81,13 @@ export default function FileTree({
         <p
           key={file.fullpath}
           style={{ paddingLeft: `${depth}rem` }}
-          className={`flex p-2 indent-4 border-t hover:bg-red-100 cursor-pointer first:border-t-0 truncate${
-            file.isCompleted ? " line-through" : ""
-          }`}
+          className="flex p-2 indent-4 border-t hover:bg-red-100 cursor-pointer first:border-t-0 truncate"
           data-depth={depth}
         >
           <button
-            className="flex-auto truncate w-full text-start"
+            className={`flex-auto truncate w-full text-start${
+              file.isCompleted ? " line-through" : ""
+            }`}
             onClick={() => play(file.fullpath)}
           >
             {file.name}
@@ -96,7 +96,7 @@ export default function FileTree({
             className="flex-none px-2"
             onClick={toggleCompletedFor(file.fullpath, file.isCompleted)}
           >
-            👀
+            {file.isCompleted ? "🙈" : "👀"}
           </button>
         </p>
       ))}
