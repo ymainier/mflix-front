@@ -13,12 +13,9 @@ export default async function VideoList({
   const files = await prisma.video.findMany({
     where: { path: { startsWith: path } },
   });
-  const sortedFiles = (files || [])
-    .map((f: { path: string }) => f.path)
-    .sort();
 
   const dir = path.endsWith("/") ? path : `${path}/`;
-  const fileTree = buildFileTree(sortedFiles, dir);
+  const fileTree = buildFileTree(files, dir);
 
   return (
     <main className="mx-auto max-w-3xl p-6 pt-12 sm:p-12">

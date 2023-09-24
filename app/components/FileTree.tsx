@@ -2,6 +2,7 @@
 import { Fragment, useState } from "react";
 import { FileTree } from "../lib/buildFileTree";
 import { play } from "../lib/vlcInterface";
+import { useRouter } from "next/navigation";
 
 interface FileTreeProps {
   fileTree: FileTree;
@@ -25,6 +26,20 @@ export default function FileTree({
   depth = 0,
 }: FileTreeProps): JSX.Element {
   const [opened, setOpened] = useState(new Set<string>());
+  const router = useRouter();
+
+  const toggleCompletedFor =
+    (path: string, wasCompleted: boolean) => async () => {
+      if (typeof window === "undefined") {
+        return;
+      }
+      const { origin } = window.location;
+      const url = new URL("/api/path/update", origin);
+      url.searchParams.set("path", path);
+      url.searchParams.set("isCompleted", wasCompleted ? "false" : "true");
+      await fetch(url, { method: "POST" });
+      router.refresh();
+    };
 
   // Render the file tree as a nested list with some styling using Tailwind CSS
   return (
@@ -33,14 +48,29 @@ export default function FileTree({
         const key = directory.name;
         return (
           <Fragment key={key}>
-            <button
+            <p
               style={{ paddingLeft: `${depth}rem` }}
-              className="w-full text-start p-2 indent-4 border-t text-red-700 hover:bg-red-100 cursor-pointer first:border-t-0"
-              onClick={() => setOpened(toggle(key))}
+              className={`flex p-2 indent-4 border-t text-red-700 hover:bg-red-100 cursor-pointer first:border-t-0${
+                directory.isCompleted ? " line-through" : ""
+              }`}
               data-depth={depth}
             >
-              {key}/
-            </button>
+              <button
+                className="flex-auto truncate w-full text-start"
+                onClick={() => setOpened(toggle(key))}
+              >
+                {key}/
+              </button>
+              <button
+                className="flex-none px-2"
+                onClick={toggleCompletedFor(
+                  directory.fullpath,
+                  directory.isCompleted
+                )}
+              >
+                👀
+              </button>
+            </p>
             {opened.has(key) && (
               <FileTree fileTree={directory} depth={depth + 1} />
             )}
@@ -48,15 +78,27 @@ export default function FileTree({
         );
       })}
       {fileTree.files.map((file) => (
-        <button
+        <p
           key={file.fullpath}
           style={{ paddingLeft: `${depth}rem` }}
-          className="w-full p-2 indent-4 border-t text-start hover:bg-red-100 cursor-pointer first:border-t-0"
-          onClick={() => play(file.fullpath)}
+          className={`flex p-2 indent-4 border-t hover:bg-red-100 cursor-pointer first:border-t-0 truncate${
+            file.isCompleted ? " line-through" : ""
+          }`}
           data-depth={depth}
         >
-          {file.name}
-        </button>
+          <button
+            className="flex-auto truncate w-full text-start"
+            onClick={() => play(file.fullpath)}
+          >
+            {file.name}
+          </button>
+          <button
+            className="flex-none px-2"
+            onClick={toggleCompletedFor(file.fullpath, file.isCompleted)}
+          >
+            👀
+          </button>
+        </p>
       ))}
     </Fragment>
   );

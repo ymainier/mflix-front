@@ -1,21 +1,26 @@
-type FileObject = { name: string; fullpath: string };
+type FileObject = { name: string; fullpath: string; isCompleted: boolean };
 type DirectoryObject = {
   name: string;
   files: Array<FileObject>;
   directories: Array<DirectoryObject>;
+  fullpath: string;
+  isCompleted: boolean;
 };
 export type FileTree = {
   files: Array<FileObject>;
   directories: Array<DirectoryObject>;
 };
 
-export function buildFileTree(filePaths: string[], prefixToIgnore: string): FileTree {
+export function buildFileTree(
+  files: Array<{ path: string; isCompleted: boolean }>,
+  prefixToIgnore: string
+): FileTree {
   // Create an object to hold the file tree
   const fileTree: FileTree = { files: [], directories: [] };
 
   // Loop through each file path
-  for (let i = 0; i < filePaths.length; i++) {
-    const filePath = filePaths[i];
+  for (let i = 0; i < files.length; i++) {
+    const filePath = files[i].path;
 
     // Split the file path into an array of directory and file names
     const filenameToConsider = prefixToIgnore
@@ -37,7 +42,19 @@ export function buildFileTree(filePaths: string[], prefixToIgnore: string): File
         );
         // If the directory doesn't already exist in the file tree, create it
         if (!directory) {
-          directory = { name: pathPart, files: [], directories: [] };
+          const fullpath = `${prefixToIgnore}${pathParts
+            .slice(0, j + 1)
+            .join("/")}`;
+          const isCompleted = files
+            .filter((f) => f.path.startsWith(fullpath))
+            .every((f) => f.isCompleted);
+          directory = {
+            name: pathPart,
+            files: [],
+            directories: [],
+            fullpath,
+            isCompleted,
+          };
           currentNode.directories.push(directory);
         }
 
@@ -47,7 +64,11 @@ export function buildFileTree(filePaths: string[], prefixToIgnore: string): File
       // Otherwise, the path part is a file name
       else {
         // Add the file name to the current directory's list of files
-        currentNode.files.push({ name: pathPart, fullpath: filePath });
+        currentNode.files.push({
+          name: pathPart,
+          fullpath: filePath,
+          isCompleted: files[i].isCompleted,
+        });
       }
     }
   }
