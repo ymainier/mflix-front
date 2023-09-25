@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import type { ReactNode } from "react";
 import {
   status as queryStatus,
@@ -9,6 +9,7 @@ import {
   focus,
 } from "../lib/vlcInterface";
 import { fetchClient } from "../lib/fetchClient";
+import { useRouter } from "next/navigation";
 
 type Status = "stopped" | "playing" | "paused";
 
@@ -98,11 +99,28 @@ function reducer(state: State, action: Action): State {
   throw new Error("Unknown action");
 }
 
+function usePrevious<T>(state: T): T | undefined {
+  const ref = useRef<T>();
+
+  useEffect(() => {
+    ref.current = state;
+  });
+
+  return ref.current;
+}
+
 export default function MiniPlayer() {
+  const router = useRouter();
   const [{ status, time, length, title }, dispatch] = useReducer(
     reducer,
     INTIAL_STATE
   );
+  const previousTitle = usePrevious(title);
+
+  if (previousTitle && previousTitle !== title) {
+    router.refresh();
+  }
+
   useEffect(() => {
     let mounted = true;
     const id = setInterval(async () => {
