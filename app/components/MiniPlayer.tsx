@@ -8,6 +8,7 @@ import {
   stop,
   focus,
 } from "../lib/vlcInterface";
+import { fetchClient } from "../lib/fetchClient";
 
 type Status = "stopped" | "playing" | "paused";
 
@@ -114,6 +115,13 @@ export default function MiniPlayer() {
           length: result.data.length,
           fullpath: result.data.fullpath,
         });
+      }
+      if (result.data.status === "playing") {
+        fetchClient(
+          "/api/path/update",
+          { path: result.data.fullpath, secondsPlayed: result.data.time },
+          { method: "POST" }
+        );
       }
     }, 1000);
     return () => {
