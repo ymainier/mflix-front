@@ -3,6 +3,7 @@ import { Fragment, useState } from "react";
 import { FileTree } from "../lib/buildFileTree";
 import { play } from "../lib/vlcInterface";
 import { useRouter } from "next/navigation";
+import { fetchClient } from "../lib/fetchClient";
 
 interface FileTreeProps {
   fileTree: FileTree;
@@ -30,14 +31,11 @@ export default function FileTree({
 
   const toggleCompletedFor =
     (path: string, wasCompleted: boolean) => async () => {
-      if (typeof window === "undefined") {
-        return;
-      }
-      const { origin } = window.location;
-      const url = new URL("/api/path/update", origin);
-      url.searchParams.set("path", path);
-      url.searchParams.set("isCompleted", wasCompleted ? "false" : "true");
-      await fetch(url, { method: "POST" });
+      await fetchClient(
+        "/api/path/update",
+        { path, isCompleted: wasCompleted ? "false" : "true" },
+        { method: "POST" }
+      );
       router.refresh();
     };
 
