@@ -1,7 +1,7 @@
 "use client";
 import { Fragment, useState } from "react";
 import { FileTree } from "../lib/buildFileTree";
-import { play } from "../lib/vlcInterface";
+import { play, seek } from "../lib/vlcInterface";
 import { useRouter } from "next/navigation";
 import { fetchClient } from "../lib/fetchClient";
 
@@ -86,7 +86,12 @@ export default function FileTree({
             className={`flex-auto truncate w-full text-start${
               file.isCompleted ? " line-through" : ""
             }`}
-            onClick={() => play(file.fullpath)}
+            onClick={async () => {
+              await play(file.fullpath);
+              if (file.secondsPlayed > 0) {
+                await seek(file.secondsPlayed);
+              }
+            }}
           >
             {file.name}
           </button>

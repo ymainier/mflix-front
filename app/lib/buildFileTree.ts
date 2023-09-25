@@ -1,4 +1,9 @@
-type FileObject = { name: string; fullpath: string; isCompleted: boolean };
+type FileObject = {
+  name: string;
+  fullpath: string;
+  isCompleted: boolean;
+  secondsPlayed: number;
+};
 type DirectoryObject = {
   name: string;
   files: Array<FileObject>;
@@ -12,7 +17,7 @@ export type FileTree = {
 };
 
 export function buildFileTree(
-  files: Array<{ path: string; isCompleted: boolean }>,
+  files: Array<{ path: string; isCompleted: boolean; secondsPlayed: number }>,
   prefixToIgnore: string
 ): FileTree {
   // Create an object to hold the file tree
@@ -68,6 +73,7 @@ export function buildFileTree(
           name: pathPart,
           fullpath: filePath,
           isCompleted: files[i].isCompleted,
+          secondsPlayed: files[i].secondsPlayed,
         });
       }
     }
