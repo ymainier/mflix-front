@@ -12,6 +12,7 @@ export default async function VideoList({
 }) {
   const files = await prisma.video.findMany({
     where: { path: { startsWith: path } },
+    orderBy: { path: "asc" },
   });
 
   const dir = path.endsWith("/") ? path : `${path}/`;
