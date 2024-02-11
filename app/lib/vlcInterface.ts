@@ -10,7 +10,7 @@ function url(path: string, qs?: Record<string, string | number>): string {
 }
 
 export async function status(qs: Record<string, string | number> = {}) {
-  const result = await fetch(url("/player/status"));
+  const result = await fetch("/api/player/status");
   return await result.json();
 }
 
