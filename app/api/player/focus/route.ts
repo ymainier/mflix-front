@@ -11,9 +11,9 @@ const promisifiedExec = promisify(exec);
 
 export async function POST() {
   try {
-    await promisifiedExec(`echo "scan" | cec-client -s -d 1`);
+    const {stdout, stderr} = await promisifiedExec(`echo "as" | cec-client -s -d 1`);
 
-    return NextResponse.json({ data: {} });
+    return NextResponse.json({ data: { stdout, stderr } });
   } catch (e) {
     return errorResponse(e, 500);
   }
