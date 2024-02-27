@@ -25,8 +25,15 @@ export async function stop() {
 export async function seek(value: number) {
   await fetch(
     `/api/player/seek?${new URLSearchParams({ value: `${value}` }).toString()}`,
-    {
-      method: "POST",
-    }
+    { method: "POST" }
+  );
+}
+
+export async function subtitle(value: string) {
+  await fetch(
+    `/api/player/subtitle?${new URLSearchParams({
+      value: `${value}`,
+    }).toString()}`,
+    { method: "POST" }
   );
 }

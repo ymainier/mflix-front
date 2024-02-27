@@ -19,12 +19,28 @@ export async function GET() {
         ? decodeURI(new URL(maybeUri).pathname)
         : undefined;
 
+    const { category = {} } = statusData.information ?? {};
+
+    type Category = {
+      Type?: string;
+      Description?: string;
+      Language?: "string";
+    };
+
+    const subtitles = Object.entries<Category>(category)
+      .filter(([_, v]) => v.Type === "Subtitle")
+      .map(([k, v]) => ({
+        value: k.replace(/stream /i, ""),
+        name: `${v.Description} [${v.Language}]`,
+      }));
+
     return NextResponse.json({
       data: {
         status: statusData.state,
         time: statusData.time,
         length: statusData.length,
         fullpath,
+        subtitles,
       },
     });
   } catch (e) {

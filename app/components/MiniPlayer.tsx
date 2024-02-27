@@ -7,6 +7,7 @@ import {
   seek,
   stop,
   focus,
+  subtitle,
 } from "../lib/vlcInterface";
 import { fetchClient } from "../lib/fetchClient";
 import { useRouter } from "next/navigation";
@@ -54,6 +55,7 @@ type Action =
       time: number;
       length: number;
       fullpath: string;
+      subtitles: Array<{ value: string; name: string }>;
     }
   | { type: "UPDATE_TIME"; time: number };
 
@@ -63,6 +65,7 @@ type State = {
   length: number;
   fullpath: string;
   title: string;
+  subtitles: Array<{ value: string; name: string }>;
 };
 
 const INTIAL_STATE: State = {
@@ -71,7 +74,10 @@ const INTIAL_STATE: State = {
   length: 0,
   fullpath: "",
   title: "",
+  subtitles: [],
 };
+
+const SKIP = "_";
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -86,6 +92,7 @@ function reducer(state: State, action: Action): State {
           length: action.length,
           fullpath: action.fullpath,
           title: action.fullpath,
+          subtitles: action.subtitles,
         };
       }
     }
@@ -110,8 +117,9 @@ function usePrevious<T>(state: T): T | undefined {
 }
 
 export default function MiniPlayer() {
+  const selectRef = useRef<HTMLSelectElement>(null);
   const router = useRouter();
-  const [{ status, time, length, title }, dispatch] = useReducer(
+  const [{ status, time, length, title, subtitles }, dispatch] = useReducer(
     reducer,
     INTIAL_STATE
   );
@@ -119,6 +127,9 @@ export default function MiniPlayer() {
 
   if (previousTitle && previousTitle !== title) {
     router.refresh();
+    if (typeof selectRef.current?.value === "string") {
+      selectRef.current.value = SKIP;
+    }
   }
 
   useEffect(() => {
@@ -132,6 +143,7 @@ export default function MiniPlayer() {
           time: result.data.time,
           length: result.data.length,
           fullpath: result.data.fullpath,
+          subtitles: result.data.subtitles,
         });
       }
       if (result.data.status === "playing") {
@@ -218,7 +230,7 @@ export default function MiniPlayer() {
                 />
               </svg>
             </Button>
-            <Button onClick={focus} className="ml-4">
+            <Button onClick={focus} className="mx-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -235,6 +247,26 @@ export default function MiniPlayer() {
               </svg>
               <span className="sr-only">Focus</span>
             </Button>
+            {subtitles.length >= 1 && (
+              <select
+                ref={selectRef}
+                onChange={async (e) => {
+                  const val = e.target.value;
+                  if (val !== SKIP) {
+                    await subtitle(val);
+                  }
+                }}
+                className="border border-red-700 rounded w-16 h-[30px] p-1"
+              >
+                <option value={SKIP}>Subtitle?</option>
+                <option value="-1">none</option>
+                {subtitles.map(({ name, value }) => (
+                  <option key={value} value={value}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           <span className="basis-1/5 text-xs text-end">
             {duration(length, durationType)}
