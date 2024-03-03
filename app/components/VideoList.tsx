@@ -1,15 +1,17 @@
 import Link from "next/link";
 import FileTree from "../components/FileTree";
-import { buildFileTree } from "../lib/buildFileTree";
+import { FileObject, buildFileTree } from "../lib/buildFileTree";
 import prisma from "../lib/prisma";
 import Update from "./Update";
 
 export default async function VideoList({
   title,
   path,
+  tvShow,
 }: {
   title: string;
   path: string;
+  tvShow?: boolean;
 }) {
   const files = await prisma.video.findMany({
     where: { path: { startsWith: path } },
@@ -17,7 +19,9 @@ export default async function VideoList({
   });
 
   const dir = path.endsWith("/") ? path : `${path}/`;
-  const fileTree = buildFileTree(files, dir);
+  console.time('buildFileTree');
+  const fileTree = buildFileTree(files, dir, tvShow);
+  console.timeEnd('buildFileTree');
 
   return (
     <main className="mx-auto max-w-3xl p-6 pt-12 sm:p-12">

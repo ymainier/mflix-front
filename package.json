@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ctrl/video-filename-parser": "^5.1.0",
     "@prisma/client": "^5.3.1",
     "@types/node": "20.5.9",
     "@types/react": "18.2.21",

@@ -1,9 +1,10 @@
 "use client";
-import { Fragment, useState } from "react";
-import { FileTree } from "../lib/buildFileTree";
+import { Fragment, useMemo, useState } from "react";
+import { FileObject, FileTree } from "../lib/buildFileTree";
 import { play, seek } from "../lib/vlcInterface";
 import { useRouter } from "next/navigation";
 import { fetchClient } from "../lib/fetchClient";
+import { filenameParse } from "@ctrl/video-filename-parser";
 
 interface FileTreeProps {
   fileTree: FileTree;
@@ -22,10 +23,10 @@ const toggle =
     return newSet;
   };
 
-export default function FileTree({
+const FileTree = ({
   fileTree,
   depth = 0,
-}: FileTreeProps): JSX.Element {
+}: FileTreeProps): JSX.Element => {
   const [opened, setOpened] = useState(new Set<string>());
   const router = useRouter();
 
@@ -70,7 +71,10 @@ export default function FileTree({
               </button>
             </p>
             {opened.has(key) && (
-              <FileTree fileTree={directory} depth={depth + 1} />
+              <FileTree
+                fileTree={directory}
+                depth={depth + 1}
+              />
             )}
           </Fragment>
         );
@@ -105,4 +109,6 @@ export default function FileTree({
       ))}
     </Fragment>
   );
-}
+};
+
+export default FileTree;

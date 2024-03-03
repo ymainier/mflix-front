@@ -1,8 +1,11 @@
-type FileObject = {
+import { filenameParse } from "@ctrl/video-filename-parser";
+
+export type FileObject = {
   name: string;
   fullpath: string;
   isCompleted: boolean;
   secondsPlayed: number;
+  episode?: number;
 };
 type DirectoryObject = {
   name: string;
@@ -16,9 +19,43 @@ export type FileTree = {
   directories: Array<DirectoryObject>;
 };
 
+const tvShowSorter = (a: FileObject, b: FileObject) => {
+  return a.episode! - b.episode!;
+};
+
+function orderFilesByEpisode(files: Array<FileObject>): Array<FileObject> {
+  return files.sort(tvShowSorter);
+}
+
+function orderDirectoryByEpisode(dir: DirectoryObject): DirectoryObject {
+  return {
+    ...dir,
+    files: orderFilesByEpisode(dir.files),
+    directories: dir.directories.map(orderDirectoryByEpisode),
+  };
+}
+
+function orderByEpisode(fileTree: FileTree): FileTree {
+  return {
+    directories: fileTree.directories.map(orderDirectoryByEpisode),
+    files: fileTree.files.sort(tvShowSorter),
+  };
+}
+
+let pathToEpisode = new Map<string, number | undefined>()
+
+function getEpisode(pathPart: string, tvShow?: boolean) {
+  if (!tvShow) return undefined;
+  if (pathToEpisode.has(pathPart)) return pathToEpisode.get(pathPart);
+  // @ts-expect-error filenameParse typing issue
+  const episode: number | undefined = filenameParse(pathPart, true).episodeNumbers[0];
+  pathToEpisode.set(pathPart, episode);
+}
+
 export function buildFileTree(
   files: Array<{ path: string; isCompleted: boolean; secondsPlayed: number }>,
-  prefixToIgnore: string
+  prefixToIgnore: string,
+  tvShow?: boolean
 ): FileTree {
   // Create an object to hold the file tree
   const fileTree: FileTree = { files: [], directories: [] };
@@ -74,10 +111,11 @@ export function buildFileTree(
           fullpath: filePath,
           isCompleted: files[i].isCompleted,
           secondsPlayed: files[i].secondsPlayed,
+          episode: getEpisode(pathPart, tvShow),
         });
       }
     }
   }
 
-  return fileTree;
+  return tvShow ? orderByEpisode(fileTree) : fileTree;
 }
