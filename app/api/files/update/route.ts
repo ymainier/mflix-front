@@ -6,12 +6,23 @@ import prisma from "@/app/lib/prisma";
 
 const promisifiedExec = promisify(exec);
 
+const AUTHORISED_PATH = [
+  process.env.NEXT_PUBLIC_SHOWS_ROOT,
+  process.env.NEXT_PUBLIC_MOVIES_ROOT,
+];
+
 export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const path = searchParams.get("path");
     if (!path) {
       return errorResponse({ message: "specify a path query parameter" }, 400);
+    }
+    if (!AUTHORISED_PATH.includes(path)) {
+      return errorResponse(
+        { message: `path can only be in [${AUTHORISED_PATH.join(", ")}]` },
+        400
+      );
     }
     const paths = await promisifiedExec(
       `find ${path} -type f -name \\*.mp4 -o -name \\*.mkv -o -name \\*.avi`
