@@ -12,4 +12,24 @@ model Video {
   path          String  @unique
   isCompleted   Boolean @default(false)
   secondsPlayed Int     @default(0)
+  episodeNumber Int?
+  Season        Season? @relation(fields: [seasonId], references: [id])
+  seasonId      Int?
+}
+
+model TvShow {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  tmdbId  String?
+  seasons Season[]
+}
+
+model Season {
+  id       Int     @id @default(autoincrement())
+  number   Int
+  TvShow   TvShow? @relation(fields: [tvShowId], references: [id])
+  tvShowId Int?
+  videos   Video[]
+
+  @@unique([number, tvShowId])
 }
