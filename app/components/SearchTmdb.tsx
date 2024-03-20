@@ -13,8 +13,7 @@ const options = {
   method: "GET",
   headers: {
     accept: "application/json",
-    Authorization:
-      "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0Y2VjZGJlMjcyYmI4ZDliNWEyNTE4ZTlmNzBhMjQzYyIsInN1YiI6IjYzOTYxNWM4YTFhOWJhMDBlMjA3MDVhNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JUXDMqzGHCBI_Qtgs20NUUjqGy76VCpD9f3KSVv8ot0",
+    Authorization: `Bearer ${process.env.NEXT_PUBLIC_TMDB_API_KEY}`,
   },
 };
 
