@@ -18,10 +18,14 @@ model Video {
 }
 
 model TvShow {
-  id      Int      @id @default(autoincrement())
-  name    String   @unique
-  tmdbId  String?
-  seasons Season[]
+  id               Int      @id @default(autoincrement())
+  name             String   @unique
+  seasons          Season[]
+  tmdbId           String?
+  tmdbName         String?
+  tmdbOverview     String?
+  tmdbPosterPath   String?
+  tmdbBackdropPath String?
 }
 
 model Season {
