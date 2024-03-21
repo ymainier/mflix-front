@@ -147,11 +147,18 @@ export default function MiniPlayer() {
         });
       }
       if (result.data.status === "playing") {
-        fetchClient(
-          "/api/path/update",
-          { path: result.data.fullpath, secondsPlayed: result.data.time },
-          { method: "POST" }
-        );
+        const qs: {
+          path: string;
+          secondsPlayed: string;
+          isCompleted?: "true";
+        } = {
+          path: result.data.fullpath,
+          secondsPlayed: result.data.time,
+        };
+        if (result.data.time / result.data.length > 0.9) {
+          qs.isCompleted = "true";
+        }
+        fetchClient("/api/path/update", qs, { method: "POST" });
       }
     }, 1000);
     return () => {

@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { errorResponse } from "../../utils";
 import prisma from "@/app/lib/prisma";
 
-type ParsedParameters =  { isCompleted?: boolean; secondsPlayed?: number } ;
-function parseUpdateParameters(searchParams: URLSearchParams): ParsedParameters {
+type ParsedParameters = { isCompleted?: boolean; secondsPlayed?: number };
+function parseUpdateParameters(
+  searchParams: URLSearchParams
+): ParsedParameters {
   const update: ParsedParameters = {};
   const isCompleted = searchParams.get("isCompleted");
   const secondsPlayed = parseInt(searchParams.get("secondsPlayed") ?? "", 10);
@@ -24,11 +26,20 @@ export async function POST(request: Request) {
       return errorResponse({ message: "specify a path query parameter" }, 400);
     }
     const update = parseUpdateParameters(searchParams);
-    if (typeof update.isCompleted === 'undefined' && typeof update.secondsPlayed === 'undefined') {
-      return errorResponse({ message: "specify either a isCompleted or secondsPlayed query parameter, or both" }, 400);
+    if (
+      typeof update.isCompleted === "undefined" &&
+      typeof update.secondsPlayed === "undefined"
+    ) {
+      return errorResponse(
+        {
+          message:
+            "specify either a isCompleted or secondsPlayed query parameter, or both",
+        },
+        400
+      );
     }
 
-    await prisma.video.updateMany({
+    const result = await prisma.video.updateMany({
       where: { path: { startsWith: path } },
       data: update,
     });
