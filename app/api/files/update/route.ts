@@ -5,6 +5,8 @@ import { errorResponse } from "../../utils";
 import prisma from "@/app/lib/prisma";
 import { filenameParse } from "@ctrl/video-filename-parser";
 
+import type { Season, TvShow } from "@prisma/client";
+
 const promisifiedExec = promisify(exec);
 
 const AUTHORISED_PATH = [
@@ -13,6 +15,37 @@ const AUTHORISED_PATH = [
 ];
 
 const SEASON_REGEX = /^(?:s|season) *(\d+)$/i;
+
+const tvshowMap = new Map<string, TvShow>();
+
+async function upsertTvShow(name: string): Promise<TvShow> {
+  if (tvshowMap.has(name)) {
+    return tvshowMap.get(name)!;
+  }
+  const tvShow = await prisma.tvShow.upsert({
+    where: { name },
+    create: { name },
+    update: {},
+  });
+  tvshowMap.set(name, tvShow)
+  return tvShow;
+}
+
+const seasonMap = new Map<string, Season>();
+
+async function upsertSeason(number: number, tvShowId: number): Promise<Season> {
+  const key = `${number}-${tvShowId}`;
+  if (seasonMap.has(key)) {
+    return seasonMap.get(key)!;
+  }
+  const season = await prisma.season.upsert({
+    where: { number_tvShowId: { number, tvShowId } },
+    create: { number, tvShowId },
+    update: {},
+  });
+  seasonMap.set(key, season);
+  return season;
+}
 
 async function updateVideo(videos: Array<string>, path: string) {
   const existingVideoPathsArray = await prisma.video.findMany({
@@ -33,31 +66,22 @@ async function updateVideo(videos: Array<string>, path: string) {
         : `${process.env.NEXT_PUBLIC_SHOWS_ROOT}/`;
       const elts = path.replace(new RegExp(`^${dir}`), "").split("/");
       const name = elts[0];
-      const tvShow = await prisma.tvShow.upsert({
-        where: { name },
-        create: { name },
-        update: {},
-      });
+      const tvShow = await upsertTvShow(name);
       const seasonName = elts[1];
       const seasonMatch = seasonName.match(SEASON_REGEX);
       if (seasonMatch) {
         const number = parseInt(seasonMatch[1], 10);
-        season = await prisma.season.upsert({
-          where: { number_tvShowId: { number, tvShowId: tvShow.id } },
-          create: { number, tvShowId: tvShow.id },
-          update: {},
-        });
+        season = await upsertSeason(number, tvShow.id);
         const parsed = filenameParse(elts[elts.length - 1], true);
         // @ts-expect-error filenameParse types for tv show are wrong
         episodeNumber = parsed.episodeNumbers?.[0];
-
       }
     }
     const seasonId = season?.id;
     await prisma.video.upsert({
       where: { path },
       create: { path, seasonId, episodeNumber },
-      update: { seasonId, episodeNumber },
+      update: {},
     });
     videosToRemove.delete(path);
   }
