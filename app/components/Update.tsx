@@ -7,7 +7,7 @@ export default function Update({ dir }: { dir: string }) {
   const router = useRouter();
   return (
     <button
-      className="text-red-700 hover:text-white bg-white hover:bg-red-700 border border-red-700 rounded-full p-2 mx-0.5 mb-2 text-center inline-flex items-center"
+      className="text-red-700 hover:text-white bg-white hover:bg-red-700 border border-red-700 rounded-full p-2 text-center inline-flex items-center mb-4"
       onClick={async () => {
         await fetch(`/api/files/update?path=${dir}`, { method: "POST" });
         router.refresh();

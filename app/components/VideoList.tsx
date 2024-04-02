@@ -3,6 +3,7 @@ import FileTree from "../components/FileTree";
 import { FileObject, buildFileTree } from "../lib/buildFileTree";
 import prisma from "../lib/prisma";
 import Update from "./Update";
+import { Focus } from "@/app/components/PlayerButtons";
 
 export default async function VideoList({
   title,
@@ -29,6 +30,7 @@ export default async function VideoList({
         <div className="flex gap-4">
           <h1 className="text-2xl">{title}</h1>
           <Update dir={dir.substring(0, dir.length - 1)} />
+          <Focus className="mb-4" />
         </div>
         <Link
           href="/"

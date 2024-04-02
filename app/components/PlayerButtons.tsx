@@ -19,9 +19,9 @@ function Button({ onClick, children, className = "" }: ButtonProps) {
   );
 }
 
-export function Focus() {
+export function Focus({ className }: { className?: string }) {
   return (
-    <Button onClick={focus} className="mx-4">
+    <Button onClick={focus} className={className}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

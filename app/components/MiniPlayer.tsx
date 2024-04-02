@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 type Status = "stopped" | "playing" | "paused";
 
 type ButtonProps = {
-  onClick: () => void;
+  onClick?: () => void;
   children: ReactNode;
   className?: string;
 };
@@ -40,7 +40,7 @@ function duration(_seconds: number, type: "minutes" | "hours"): string {
 function Button({ onClick, children, className = "" }: ButtonProps) {
   return (
     <button
-      className={`text-white bg-red-700 rounded-full p-2 mx-0.5 mb-2 text-center inline-flex items-center ${className}`}
+      className={`text-white bg-red-700 rounded-full p-3 text-center inline-flex items-center ${className}`}
       onClick={onClick}
     >
       {children}
@@ -169,10 +169,13 @@ export default function MiniPlayer() {
 
   if (status === "stopped") return null;
   const durationType = length < 3600 ? "minutes" : "hours";
+
+  const titleElements = title.split('/');
+
   return (
     <div className="fixed bottom-0 w-full bg-white shadow-[0_-2px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.1)]">
-      <div className="flex flex-col max-w-4xl mx-auto px-2">
-        <p className="text-xs truncate pt-2">{title}</p>
+      <div className="flex flex-col gap-1 max-w-4xl mx-auto p-2">
+        <p className="text-sm text-center truncate">{titleElements[titleElements.length - 1]}</p>
         <input
           className="w-full"
           type="range"
@@ -190,14 +193,14 @@ export default function MiniPlayer() {
           <span className="basis-1/5 text-xs text-start">
             {duration(time, durationType)}
           </span>
-          <div className="text-center flex-grow basis-3/5">
+          <div className="text-center flex-grow basis-3/5 flex gap-2 justify-center">
             <Button onClick={togglePause}>
               {status === "playing" ? (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-4 h-4"
+                  className="w-6 h-6"
                   aria-label="pause"
                 >
                   <path
@@ -211,7 +214,7 @@ export default function MiniPlayer() {
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-4 h-4"
+                  className="w-6 h-6"
                   aria-label="play"
                 >
                   <path
@@ -227,7 +230,7 @@ export default function MiniPlayer() {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="w-4 h-4"
+                className="w-6 h-6"
                 aria-label="stop"
               >
                 <path
@@ -237,14 +240,14 @@ export default function MiniPlayer() {
                 />
               </svg>
             </Button>
-            <Button onClick={focus} className="mx-4">
+            <Button onClick={focus}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-4 h-4"
+                className="w-6 h-6"
               >
                 <path
                   strokeLinecap="round"
@@ -255,24 +258,45 @@ export default function MiniPlayer() {
               <span className="sr-only">Focus</span>
             </Button>
             {subtitles.length >= 1 && (
-              <select
-                ref={selectRef}
-                onChange={async (e) => {
-                  const val = e.target.value;
-                  if (val !== SKIP) {
-                    await subtitle(val);
-                  }
-                }}
-                className="border border-red-700 rounded w-16 h-[30px] p-1"
-              >
-                <option value={SKIP}>Subtitle?</option>
-                <option value="-1">none</option>
-                {subtitles.map(({ name, value }) => (
-                  <option key={value} value={value}>
-                    {name}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <Button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+                    />
+                  </svg>
+
+                  <span className="sr-only">Focus</span>
+                </Button>
+                <select
+                  ref={selectRef}
+                  onChange={async (e) => {
+                    const val = e.target.value;
+                    if (val !== SKIP) {
+                      await subtitle(val);
+                    }
+                  }}
+                  // className="border border-red-700 rounded w-16 h-[30px] p-1"
+                  className="absolute opacity-0 w-full h-full inset-0"
+                >
+                  <option value={SKIP}>Subtitle?</option>
+                  <option value="-1">none</option>
+                  {subtitles.map(({ name, value }) => (
+                    <option key={value} value={value}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
           </div>
           <span className="basis-1/5 text-xs text-end">
