@@ -174,7 +174,7 @@ export default function MiniPlayer() {
 
   return (
     <div className="fixed bottom-0 w-full bg-white shadow-[0_-2px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.1)]">
-      <div className="flex flex-col gap-1 max-w-4xl mx-auto p-2">
+      <div className="flex flex-col gap-1 max-w-3xl mx-auto py-2 px-6 sm:px-12">
         <p className="text-sm text-center truncate">{titleElements[titleElements.length - 1]}</p>
         <input
           className="w-full"
