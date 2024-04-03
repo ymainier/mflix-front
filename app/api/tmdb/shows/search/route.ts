@@ -3,8 +3,8 @@ import { errorResponse } from "@/app/api/utils";
 import prisma from "@/app/lib/prisma";
 import { promisePool } from "@/app/lib/promisePool";
 
-function getShowUrl(show: string): string {
-  return `https://api.themoviedb.org/3/search/tv?query=${encodeURI(
+function searchShowUrl(show: string): string {
+  return `https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(
     show
   )}&include_adult=false&language=en-US&page=1`;
 }
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       where: { tmdbId: null },
     });
     const promises = showsToRequest.map((show) => async () => {
-      const data = await fetcher(getShowUrl(show.name));
+      const data = await fetcher(searchShowUrl(show.name));
       const result = data.results[0];
       const dbShow = await prisma.tvShow.update({
         where: { id: show.id },

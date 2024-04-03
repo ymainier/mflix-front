@@ -13,6 +13,11 @@ model Video {
   isCompleted   Boolean @default(false)
   secondsPlayed Int     @default(0)
   episodeNumber Int?
+  tmdbId        Int?
+  tmdbNumber    Int?
+  tmdbName      String?
+  tmdbOverview  String?
+  tmdbStillPath String?
   Season        Season? @relation(fields: [seasonId], references: [id])
   seasonId      Int?
 }
@@ -29,11 +34,16 @@ model TvShow {
 }
 
 model Season {
-  id       Int     @id @default(autoincrement())
-  number   Int
-  TvShow   TvShow? @relation(fields: [tvShowId], references: [id])
-  tvShowId Int?
-  videos   Video[]
+  id             Int     @id @default(autoincrement())
+  number         Int
+  tmdbId         Int?
+  tmdbNumber     Int?
+  tmdbName       String?
+  tmdbOverview   String?
+  tmdbPosterPath String?
+  TvShow         TvShow? @relation(fields: [tvShowId], references: [id])
+  tvShowId       Int?
+  videos         Video[]
 
   @@unique([number, tvShowId])
 }
