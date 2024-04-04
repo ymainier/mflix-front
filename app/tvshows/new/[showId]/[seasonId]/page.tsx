@@ -3,6 +3,26 @@ import prisma from "@/app/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Playable from "@/app/tvshows/new/[showId]/[seasonId]/playable";
+import { ToggleViewable } from "@/app/tvshows/new/[showId]/[seasonId]/toggle-viewable";
+import { ReactNode } from "react";
+
+function Viewable({
+  isCompleted,
+  children,
+}: {
+  isCompleted: boolean;
+  children: ReactNode;
+}): JSX.Element {
+  return (
+    <div
+      className={`transition ease-in-out ${
+        isCompleted ? "grayscale opacity-50" : ""
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default async function Page({
   params: { showId, seasonId },
@@ -55,20 +75,38 @@ export default async function Page({
           <li key={video.id}>
             <div className="flex flex-col gap-2">
               <div className="relative">
-                <Playable path={video.path} secondsPlayed={video.secondsPlayed}>
-                  <img
-                    src={`https://image.tmdb.org/t/p/w342${video.tmdbStillPath}`}
-                    alt={video.tmdbName ?? ""}
-                    className="w-full h-auto rounded-lg"
-                  />
-                </Playable>
+                <Viewable isCompleted={video.isCompleted}>
+                  <Playable
+                    path={video.path}
+                    secondsPlayed={video.secondsPlayed}
+                  >
+                    <img
+                      src={`https://image.tmdb.org/t/p/w342${video.tmdbStillPath}`}
+                      alt={video.tmdbName ?? ""}
+                      className="w-full h-auto rounded-lg transition ease-in-out"
+                    />
+                  </Playable>
+                </Viewable>
+                <ToggleViewable
+                  id={video.id}
+                  isComplete={!video.isCompleted}
+                  className="absolute top-2 right-2 w-12 h-12 leading-[3rem] bg-white rounded-full text-center border cursor-pointer"
+                >
+                  {video.isCompleted ? "🙈" : "👀"}
+                </ToggleViewable>
               </div>
-              <Playable path={video.path} secondsPlayed={video.secondsPlayed}>
-                <h2 className="font-bold">{video.tmdbName}</h2>
-              </Playable>
-              <p className="text-sm max-h-20 overflow-auto">
-                {video.tmdbOverview}
-              </p>
+              <Viewable isCompleted={video.isCompleted}>
+                <Playable path={video.path} secondsPlayed={video.secondsPlayed}>
+                  <h2 className="font-bold transition ease-in-out">
+                    {video.tmdbNumber} - {video.tmdbName}
+                  </h2>
+                </Playable>
+              </Viewable>
+              <Viewable isCompleted={video.isCompleted}>
+                <p className="text-sm max-h-20 overflow-auto">
+                  {video.tmdbOverview}
+                </p>
+              </Viewable>
             </div>
           </li>
         ))}
