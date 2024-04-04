@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
 
 export default async function Page({
   params: { showId },
@@ -19,7 +20,7 @@ export default async function Page({
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-6 pt-12 pb-32 sm:px-12">
+    <Fragment>
       <div className="relative h-[300px]">
         {/* Background image */}
         <img
@@ -36,7 +37,7 @@ export default async function Page({
           {/* Title and metadata */}
           <div className="text-white">
             <h1 className="text-4xl font-bold mb-2">{tvShow.tmdbName}</h1>
-            <p className="text-sm">{tvShow.tmdbOverview}</p>
+            <p className="text-sm max-h-24 overflow-auto">{tvShow.tmdbOverview}</p>
           </div>
         </div>
       </div>
@@ -57,6 +58,6 @@ export default async function Page({
           </li>
         ))}
       </ul>
-    </main>
+    </Fragment>
   );
 }

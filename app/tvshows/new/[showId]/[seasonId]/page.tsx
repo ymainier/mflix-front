@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
 
 export default async function Page({
   params: { seasonId },
@@ -33,7 +34,7 @@ export default async function Page({
   const name = `${season.TvShow?.name ?? ""} - ${season.tmdbName}`;
 
   return (
-    <main className="mx-auto max-w-3xl px-6 pt-12 pb-32 sm:px-12">
+    <Fragment>
       <div className="relative h-[300px]">
         {/* Background image */}
         <img
@@ -69,6 +70,6 @@ export default async function Page({
           </li>
         ))}
       </ul>
-    </main>
+    </Fragment>
   );
 }
