@@ -2,7 +2,6 @@ import HeroImage from "@/app/components/HeroImage";
 import prisma from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Fragment } from "react";
 
 export default async function Page({
   params: { showId },
@@ -21,13 +20,21 @@ export default async function Page({
   }
 
   return (
-    <Fragment>
+    <div className="flex flex-col gap-4">
+      <div className="flex">
+        <Link
+          href="/tvshows/new"
+          className="bg-transparent hover:bg-red-700 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-700 hover:border-transparent text-center rounded"
+        >
+          back
+        </Link>
+      </div>
       <HeroImage
         src={`https://image.tmdb.org/t/p/w780${tvShow.tmdbBackdropPath}`}
         title={tvShow.tmdbName ?? ""}
         description={tvShow.tmdbOverview ?? ""}
       />
-      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-x-4 gap-y-8 mt-12">
+      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-x-4 gap-y-8 mt-4">
         {tvShow.seasons.map((season) => (
           <li key={season.id}>
             <Link
@@ -44,6 +51,6 @@ export default async function Page({
           </li>
         ))}
       </ul>
-    </Fragment>
+    </div>
   );
 }
