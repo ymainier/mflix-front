@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { errorResponse } from "@/app/api/utils";
 import prisma from "@/app/lib/prisma";
 import { promisePool } from "@/app/lib/promisePool";
+import { filenameParse } from "@ctrl/video-filename-parser";
 
 function showUrl(id: string, seasonNumbers: Array<number>): string {
   return `https://api.themoviedb.org/3/tv/${id}?append_to_response=${encodeURIComponent(
@@ -19,6 +20,13 @@ const options = {
 
 const fetcher = (url: string) => fetch(url, options).then((res) => res.json());
 
+function extractEpisodeNumber(path: string): number | null {
+  const elts = path.split("/");
+  const parsed = filenameParse(elts[elts.length - 1], true);
+  // @ts-expect-error filenameParse types for tv show are wrong
+  return parsed.episodeNumbers?.[0] ?? null;
+}
+
 export async function POST(request: Request) {
   const { searchParams } = new URL(request.url);
   const shouldReset = searchParams.has("reset");
@@ -32,6 +40,17 @@ export async function POST(request: Request) {
           tmdbName: null,
           tmdbOverview: null,
           tmdbPosterPath: null,
+        },
+      });
+
+      await prisma.video.updateMany({
+        data: {
+          episodeNumber: null,
+          tmdbId: null,
+          tmdbNumber: null,
+          tmdbName: null,
+          tmdbOverview: null,
+          tmdbStillPath: null,
         },
       });
     }
@@ -53,7 +72,6 @@ export async function POST(request: Request) {
     });
 
     const promises = showsWithSeasonsAndEpisodes.map((show) => async () => {
-      console.log(`[start] for ${show.name}`);
       try {
         const seasonNumbers = show.seasons
           .map((season) => season.number)
@@ -61,7 +79,6 @@ export async function POST(request: Request) {
         const data = await fetcher(showUrl(show.tmdbId!, seasonNumbers));
 
         for await (const tmdbSeason of data.seasons) {
-          console.log(`  [season start] for ${show.name}, ${tmdbSeason.season_number}`);
           try {
             const season = await prisma.season.findFirst({
               where: {
@@ -69,12 +86,16 @@ export async function POST(request: Request) {
                 number: tmdbSeason.season_number,
                 tmdbId: null,
               },
+              select: {
+                id: true,
+                videos: true,
+              },
             });
             if (!season) {
               continue;
             }
 
-            const udpated = await prisma.season.update({
+            await prisma.season.update({
               where: { id: season?.id },
               data: {
                 tmdbId: tmdbSeason.id,
@@ -84,15 +105,46 @@ export async function POST(request: Request) {
                 tmdbPosterPath: tmdbSeason.poster_path,
               },
             });
+
+            const detailledSeason = data[`season/${tmdbSeason.season_number}`];
+            if (detailledSeason == null) continue;
+            for await (const video of season.videos) {
+              try {
+                const episodeNumber =
+                  video.episodeNumber ?? extractEpisodeNumber(video.path);
+                if (episodeNumber == null) continue;
+                const episode = detailledSeason.episodes.find(
+                  (e: any) => e.episode_number === episodeNumber
+                );
+                if (!episode) continue;
+                await prisma.video.update({
+                  where: { id: video?.id },
+                  data: {
+                    episodeNumber,
+                    tmdbId: episode.id,
+                    tmdbNumber: episode.episode_number,
+                    tmdbName: episode.name,
+                    tmdbOverview: episode.overview,
+                    tmdbStillPath: episode.still_path,
+                  },
+                });
+              } catch (e) {
+                console.log(
+                  `something went wrong updating episode ${show.name} - ${tmdbSeason.name} (${tmdbSeason.season_number}) - ${video.episodeNumber} (${video.path})`,
+                  e
+                );
+              }
+            }
           } catch (e) {
-            console.log("something went wrong updating seasons", e, show);
+            console.log(
+              `something went wrong updating seasons ${show.name} - ${tmdbSeason.name} (${tmdbSeason.season_number})`,
+              e
+            );
           }
-          console.log(`  [season end] for ${show.name}, ${tmdbSeason.season_number}`);
         }
       } catch (err) {
         console.log("err", err);
       }
-      console.log(`[end] for ${show.name}`);
       return;
     });
 

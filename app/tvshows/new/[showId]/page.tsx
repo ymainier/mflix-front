@@ -19,7 +19,7 @@ export default async function Page({
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-6 pt-12 sm:p-12">
+    <main className="mx-auto max-w-3xl px-6 pt-12 pb-32 sm:px-12">
       <div className="relative h-[300px]">
         {/* Background image */}
         <img
@@ -40,12 +40,12 @@ export default async function Page({
           </div>
         </div>
       </div>
-      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 mt-12">
+      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-x-4 gap-y-8 mt-12">
         {tvShow.seasons.map((season) => (
           <li key={season.id}>
             <Link
               href={`/tvshows/new/${season.tvShowId}/${season.id}`}
-              className="w-full h-auto rounded-lg"
+              className="flex flex-col gap-2"
             >
               <img
                 src={`https://image.tmdb.org/t/p/w342${season.tmdbPosterPath}`}
