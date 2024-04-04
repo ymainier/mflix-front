@@ -125,12 +125,14 @@ export default function MiniPlayer() {
   );
   const previousTitle = usePrevious(title);
 
-  if (previousTitle && previousTitle !== title) {
-    router.refresh();
-    if (typeof selectRef.current?.value === "string") {
-      selectRef.current.value = SKIP;
+  useEffect(() => {
+    if (previousTitle && previousTitle !== title) {
+      router.refresh();
+      if (typeof selectRef.current?.value === "string") {
+        selectRef.current.value = SKIP;
+      }
     }
-  }
+  }, [previousTitle, router, title]);
 
   useEffect(() => {
     let mounted = true;

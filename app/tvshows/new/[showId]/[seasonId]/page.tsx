@@ -2,6 +2,7 @@ import HeroImage from "@/app/components/HeroImage";
 import prisma from "@/app/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Playable from "@/app/tvshows/new/[showId]/[seasonId]/playable";
 
 export default async function Page({
   params: { showId, seasonId },
@@ -54,13 +55,17 @@ export default async function Page({
           <li key={video.id}>
             <div className="flex flex-col gap-2">
               <div className="relative">
-                <img
-                  src={`https://image.tmdb.org/t/p/w342${video.tmdbStillPath}`}
-                  alt={video.tmdbName ?? ""}
-                  className="w-full h-auto rounded-lg"
-                />
+                <Playable path={video.path} secondsPlayed={video.secondsPlayed}>
+                  <img
+                    src={`https://image.tmdb.org/t/p/w342${video.tmdbStillPath}`}
+                    alt={video.tmdbName ?? ""}
+                    className="w-full h-auto rounded-lg"
+                  />
+                </Playable>
               </div>
-              <h2 className="font-bold">{video.tmdbName}</h2>
+              <Playable path={video.path} secondsPlayed={video.secondsPlayed}>
+                <h2 className="font-bold">{video.tmdbName}</h2>
+              </Playable>
               <p className="text-sm max-h-20 overflow-auto">
                 {video.tmdbOverview}
               </p>
