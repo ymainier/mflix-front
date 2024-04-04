@@ -6,6 +6,10 @@ import Playable from "@/app/tvshows/new/[showId]/[seasonId]/playable";
 import { ToggleViewable } from "@/app/tvshows/new/[showId]/[seasonId]/toggle-viewable";
 import { ReactNode } from "react";
 
+// TODO revisit and use a better revalidation strategy
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function Viewable({
   isCompleted,
   children,

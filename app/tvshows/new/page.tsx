@@ -1,6 +1,10 @@
 import prisma from "@/app/lib/prisma";
 import Link from "next/link";
 
+// TODO revisit and use a better revalidation strategy
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function NewTvShows() {
   const tvShows = await prisma.tvShow.findMany({
     orderBy: { name: "asc" },

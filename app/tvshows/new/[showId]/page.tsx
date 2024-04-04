@@ -3,6 +3,10 @@ import prisma from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+// TODO revisit and use a better revalidation strategy
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Page({
   params: { showId },
 }: {
