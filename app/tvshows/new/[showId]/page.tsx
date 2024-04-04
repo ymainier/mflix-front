@@ -1,3 +1,4 @@
+import HeroImage from "@/app/components/HeroImage";
 import prisma from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,26 +22,11 @@ export default async function Page({
 
   return (
     <Fragment>
-      <div className="relative h-[300px]">
-        {/* Background image */}
-        <img
-          src={`https://image.tmdb.org/t/p/w780${tvShow.tmdbBackdropPath}`}
-          alt={tvShow.tmdbName ?? ""}
-          className="w-full h-full object-cover rounded-lg"
-        />
-
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black rounded-lg"></div>
-
-        {/* Content */}
-        <div className="absolute inset-0 flex flex-col justify-end p-4">
-          {/* Title and metadata */}
-          <div className="text-white">
-            <h1 className="text-4xl font-bold mb-2">{tvShow.tmdbName}</h1>
-            <p className="text-sm max-h-24 overflow-auto">{tvShow.tmdbOverview}</p>
-          </div>
-        </div>
-      </div>
+      <HeroImage
+        src={`https://image.tmdb.org/t/p/w780${tvShow.tmdbBackdropPath}`}
+        title={tvShow.tmdbName ?? ""}
+        description={tvShow.tmdbOverview ?? ""}
+      />
       <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-x-4 gap-y-8 mt-12">
         {tvShow.seasons.map((season) => (
           <li key={season.id}>
