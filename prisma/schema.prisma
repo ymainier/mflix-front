@@ -25,6 +25,7 @@ model Video {
 model TvShow {
   id               Int      @id @default(autoincrement())
   name             String   @unique
+  isCompleted      Boolean  @default(false)
   seasons          Season[]
   tmdbId           String?
   tmdbName         String?
@@ -36,6 +37,7 @@ model TvShow {
 model Season {
   id             Int     @id @default(autoincrement())
   number         Int
+  isCompleted    Boolean @default(false)
   tmdbId         Int?
   tmdbNumber     Int?
   tmdbName       String?

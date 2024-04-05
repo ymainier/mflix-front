@@ -3,30 +3,12 @@ import prisma from "@/app/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Playable from "@/app/tvshows/new/[showId]/[seasonId]/playable";
-import { ToggleViewable } from "@/app/tvshows/new/[showId]/[seasonId]/toggle-viewable";
-import { ReactNode } from "react";
+import { ToggleViewable } from "@/app/components/toggle-viewable";
+import { Viewable } from "@/app/components/Viewable";
 
 // TODO revisit and use a better revalidation strategy
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-function Viewable({
-  isCompleted,
-  children,
-}: {
-  isCompleted: boolean;
-  children: ReactNode;
-}): JSX.Element {
-  return (
-    <div
-      className={`transition ease-in-out ${
-        isCompleted ? "grayscale opacity-50" : ""
-      }`}
-    >
-      {children}
-    </div>
-  );
-}
 
 export default async function Page({
   params: { showId, seasonId },
@@ -69,9 +51,12 @@ export default async function Page({
         </Link>
       </div>
       <HeroImage
+        id={season.id}
+        kind="season"
         src={`https://image.tmdb.org/t/p/w780${season.tmdbPosterPath}`}
         title={name}
         description={season.tmdbOverview ?? ""}
+        isCompleted={season.isCompleted}
       />
 
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8 mt-4">
@@ -93,11 +78,10 @@ export default async function Page({
                 </Viewable>
                 <ToggleViewable
                   id={video.id}
-                  isComplete={!video.isCompleted}
+                  kind="episode"
+                  isCompleted={!video.isCompleted}
                   className="absolute top-2 right-2 w-12 h-12 leading-[3rem] bg-white rounded-full text-center border cursor-pointer"
-                >
-                  {video.isCompleted ? "🙈" : "👀"}
-                </ToggleViewable>
+                />
               </div>
               <Viewable isCompleted={video.isCompleted}>
                 <Playable path={video.path} secondsPlayed={video.secondsPlayed}>
