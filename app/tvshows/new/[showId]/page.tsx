@@ -2,7 +2,7 @@ import HeroImage from "@/app/components/HeroImage";
 import { Viewable } from "@/app/components/Viewable";
 import prisma from "@/app/lib/prisma";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { ToggleViewable } from "@/app/components/toggle-viewable";
 
 // TODO revisit and use a better revalidation strategy
