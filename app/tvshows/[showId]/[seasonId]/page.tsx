@@ -2,9 +2,10 @@ import HeroImage from "@/app/components/HeroImage";
 import prisma from "@/app/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Playable from "@/app/tvshows/new/[showId]/[seasonId]/playable";
+import Playable from "@/app/tvshows/[showId]/[seasonId]/playable";
 import { ToggleViewable } from "@/app/components/toggle-viewable";
 import { Viewable } from "@/app/components/Viewable";
+import LightLink from "@/app/components/LightLink";
 
 // TODO revisit and use a better revalidation strategy
 export const dynamic = "force-dynamic";
@@ -50,23 +51,17 @@ export default async function Page({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-4">
-        <Link
-          href={`/tvshows/new/${showId}`}
-          className="bg-transparent hover:bg-red-700 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-700 hover:border-transparent text-center rounded"
-        >
-          back
-        </Link>
+        <LightLink href={`/tvshows/${showId}`}>back</LightLink>
 
-        <Link
+        <LightLink
           href={
             showAll
-              ? `/tvshows/new/${showId}/${seasonId}`
-              : `/tvshows/new/${showId}/${seasonId}?all`
+              ? `/tvshows/${showId}/${seasonId}`
+              : `/tvshows/${showId}/${seasonId}?all`
           }
-          className="bg-transparent hover:bg-red-700 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-700 hover:border-transparent text-center rounded"
         >
           {showAll ? "not seen" : "show all"}
-        </Link>
+        </LightLink>
       </div>
       <HeroImage
         id={season.id}
@@ -81,7 +76,7 @@ export default async function Page({
         <p>
           All episodes have been seen,
           <Link
-            href={`/tvshows/new/${showId}/${seasonId}?all`}
+            href={`/tvshows/${showId}/${seasonId}?all`}
             className="bg-transparent hover:bg-red-700 text-red-700 font-semibold hover:text-white py-2 px-2 rounded"
           >
             show everything

@@ -4,6 +4,7 @@ import prisma from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { ToggleViewable } from "@/app/components/toggle-viewable";
+import LightLink from "@/app/components/LightLink";
 
 // TODO revisit and use a better revalidation strategy
 export const dynamic = "force-dynamic";
@@ -28,12 +29,7 @@ export default async function Page({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex">
-        <Link
-          href="/tvshows/new"
-          className="bg-transparent hover:bg-red-700 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-700 hover:border-transparent text-center rounded"
-        >
-          back
-        </Link>
+        <LightLink href="/tvshows">back</LightLink>
       </div>
       <HeroImage
         id={tvShow.id}
@@ -47,7 +43,7 @@ export default async function Page({
         {tvShow.seasons.map((season) => (
           <li key={season.id}>
             <Link
-              href={`/tvshows/new/${season.tvShowId}/${season.id}`}
+              href={`/tvshows/${season.tvShowId}/${season.id}`}
               className="flex flex-col gap-2"
             >
               <div className="relative">
