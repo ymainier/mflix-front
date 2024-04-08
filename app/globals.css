@@ -11,3 +11,51 @@ body {
   color: var(--foreground-color);
   background: var(--background-color);
 }
+
+.shows {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 45deg;
+}
+
+.shows img {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  grid-column: 1;
+  grid-row: 1;
+
+  --index: 0;
+  --mask-start: calc(var(--index) * 20%);
+  --mask-end: calc(var(--index) * 20% + 20%);
+  mask-image: linear-gradient(
+    var(--angle),
+    transparent var(--mask-start),
+    black var(--mask-start) var(--mask-end),
+    transparent var(--mask-end)
+  );
+  transition: --angle 150ms;
+}
+
+.shows:hover img {
+  --angle: 135deg;
+}
+
+.shows img:nth-child(2) {
+  --index: 1;
+}
+.shows img:nth-child(3) {
+  --index: 2;
+}
+.shows img:nth-child(4) {
+  --index: 3;
+}
+.shows img:nth-child(5) {
+  --index: 4;
+}
