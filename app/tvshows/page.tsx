@@ -3,6 +3,7 @@ import prisma from "@/app/lib/prisma";
 import Link from "next/link";
 import { ToggleViewable } from "@/app/components/toggle-viewable";
 import LightLink from "@/app/components/LightLink";
+import UpdateTvShows from "@/app/components/UpdateTvShows";
 
 // TODO revisit and use a better revalidation strategy
 export const dynamic = "force-dynamic";
@@ -12,10 +13,14 @@ export default async function NewTvShows() {
   const tvShows = await prisma.tvShow.findMany({
     orderBy: { name: "asc" },
   });
+  const path = process.env.NEXT_PUBLIC_SHOWS_ROOT ?? '';
+  const dir = path.endsWith('/') ? path : `${path}/`
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex">
+      <div className="flex gap-4">
         <LightLink href="/">back</LightLink>
+        <UpdateTvShows dir={dir} />
       </div>
 
       <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">

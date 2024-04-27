@@ -1,6 +1,5 @@
 "use client";
 
-import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 
 export default function Update({ dir }: { dir: string }) {
