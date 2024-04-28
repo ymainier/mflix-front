@@ -11,30 +11,37 @@ export default function UpdateTvShows({ dir }: { dir: string }) {
     <button
       className="text-red-700 hover:text-white bg-white hover:bg-red-700 border border-red-700 rounded-full p-3 text-center inline-flex items-center"
       onClick={async () => {
-        function glow() {
-          const elt = ref.current;
-          if (!elt) return;
-          elt.style.outlineColor = "lightblue";
-          elt.style.outlineOffset = "5px";
-          setTimeout(() => {
-            elt.style.outlineColor = "transparent";
-            elt.style.outlineOffset = "0";
-          }, 200);
+        try {
+          if (ref.current) ref.current.style.animation = `pulse 800ms infinite`;
+          function glow() {
+            const elt = ref.current;
+            if (!elt) return;
+
+            elt.style.outlineColor = "rgb(185, 28, 28)";
+            elt.style.outlineOffset = "5px";
+            setTimeout(() => {
+              elt.style.outlineColor = "transparent";
+              elt.style.outlineOffset = "0";
+            }, 200);
+          }
+          await fetch(`/api/files/update?path=${dir}`, { method: "POST" });
+          glow();
+          router.refresh();
+          await fetch(`/api/tmdb/shows/search`, { method: "POST" });
+          glow();
+          router.refresh();
+          await fetch(`/api/tmdb/shows/update`, { method: "POST" });
+          glow();
+          router.refresh();
+        } finally {
+          if (ref.current) ref.current.style.animation = "";
         }
-        await fetch(`/api/files/update?path=${dir}`, { method: "POST" });
-        glow();
-        router.refresh();
-        await fetch(`/api/tmdb/shows/search`, { method: "POST" });
-        glow();
-        router.refresh();
-        await fetch(`/api/tmdb/shows/update`, { method: "POST" });
-        glow();
-        router.refresh();
       }}
       ref={ref}
       style={{
-        outline: '5px solid transparent',
-        transition: 'all 200ms ease-in-out'
+        outline: "5px solid transparent",
+        transition: "all 200ms ease-in-out",
+        boxShadow: "0 0 0 0 rgba(185, 28, 28, 1)",
       }}
     >
       <svg
