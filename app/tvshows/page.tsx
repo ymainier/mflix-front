@@ -14,13 +14,12 @@ export default async function NewTvShows() {
     orderBy: { name: "asc" },
   });
   const path = process.env.NEXT_PUBLIC_SHOWS_ROOT ?? '';
-  const dir = path.endsWith('/') ? path : `${path}/`
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-4">
         <LightLink href="/">back</LightLink>
-        <UpdateTvShows dir={dir} />
+        <UpdateTvShows dir={path} />
       </div>
 
       <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">
