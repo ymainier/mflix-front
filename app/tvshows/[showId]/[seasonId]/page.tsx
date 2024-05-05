@@ -6,6 +6,7 @@ import Playable from "@/app/tvshows/[showId]/[seasonId]/playable";
 import { ToggleViewable } from "@/app/components/toggle-viewable";
 import { Viewable } from "@/app/components/Viewable";
 import LightLink from "@/app/components/LightLink";
+import { Focus } from "@/app/components/PlayerButtons";
 
 // TODO revisit and use a better revalidation strategy
 export const dynamic = "force-dynamic";
@@ -52,7 +53,7 @@ export default async function Page({
     <div className="flex flex-col gap-4">
       <div className="flex gap-4">
         <LightLink href={`/tvshows/${showId}`}>back</LightLink>
-
+        <Focus className="p-3" />
         <LightLink
           href={
             showAll

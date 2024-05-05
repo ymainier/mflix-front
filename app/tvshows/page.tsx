@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ToggleViewable } from "@/app/components/toggle-viewable";
 import LightLink from "@/app/components/LightLink";
 import UpdateTvShows from "@/app/components/UpdateTvShows";
+import { Focus } from "@/app/components/PlayerButtons";
 
 // TODO revisit and use a better revalidation strategy
 export const dynamic = "force-dynamic";
@@ -19,6 +20,7 @@ export default async function NewTvShows() {
     <div className="flex flex-col gap-4">
       <div className="flex gap-4">
         <LightLink href="/">back</LightLink>
+        <Focus className="p-3" />
         <UpdateTvShows dir={path} />
       </div>
 

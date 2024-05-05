@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { ToggleViewable } from "@/app/components/toggle-viewable";
 import LightLink from "@/app/components/LightLink";
+import { Focus } from "@/app/components/PlayerButtons";
 
 // TODO revisit and use a better revalidation strategy
 export const dynamic = "force-dynamic";
@@ -28,8 +29,9 @@ export default async function Page({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex">
+      <div className="flex gap-4">
         <LightLink href="/tvshows">back</LightLink>
+        <Focus className="p-3" />
       </div>
       <HeroImage
         id={tvShow.id}
