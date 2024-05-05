@@ -118,6 +118,7 @@ function usePrevious<T>(state: T): T | undefined {
 
 export default function MiniPlayer() {
   const selectRef = useRef<HTMLSelectElement>(null);
+  const completedRef = useRef("");
   const router = useRouter();
   const [{ status, time, length, title, subtitles }, dispatch] = useReducer(
     reducer,
@@ -138,6 +139,7 @@ export default function MiniPlayer() {
     let mounted = true;
     const id = setInterval(async () => {
       const result = await queryStatus();
+      const isCompleted = result.data.time / result.data.length > 0.9;
       if (mounted) {
         dispatch({
           type: "UPDATE_STATUS",
@@ -157,10 +159,14 @@ export default function MiniPlayer() {
           path: result.data.fullpath,
           secondsPlayed: result.data.time,
         };
-        if (result.data.time / result.data.length > 0.9) {
+        if (isCompleted) {
           qs.isCompleted = "true";
         }
-        fetchClient("/api/path/update", qs, { method: "POST" });
+        await fetchClient("/api/path/update", qs, { method: "POST" });
+        if (completedRef.current === result.data.fullpath && isCompleted) {
+          router.refresh();
+        }
+        completedRef.current = `${result.data.fullpath}${isCompleted ? '<<completed>>' : ''}`;
       }
     }, 1000);
     return () => {
@@ -172,12 +178,14 @@ export default function MiniPlayer() {
   if (status === "stopped") return null;
   const durationType = length < 3600 ? "minutes" : "hours";
 
-  const titleElements = title.split('/');
+  const titleElements = title.split("/");
 
   return (
     <div className="fixed bottom-0 w-full bg-white shadow-[0_-2px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.1)]">
       <div className="flex flex-col gap-1 max-w-3xl mx-auto py-2 px-6 sm:px-12">
-        <p className="text-sm text-center truncate">{titleElements[titleElements.length - 1]}</p>
+        <p className="text-sm text-center truncate">
+          {titleElements[titleElements.length - 1]}
+        </p>
         <input
           className="w-full"
           type="range"

@@ -43,6 +43,7 @@ export async function POST(request: Request) {
       where: { path: { startsWith: path } },
       data: update,
     });
+    // if update contains isCompleted, update tvshow and season isCompleted
     await prisma.$disconnect();
 
     return NextResponse.json({ data: null });
