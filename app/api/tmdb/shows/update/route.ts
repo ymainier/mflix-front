@@ -148,6 +148,23 @@ export async function POST(request: Request) {
       return;
     });
 
+    // update tvshow isCompleted to false if there is video that is not completed
+    await prisma.tvShow.updateMany({
+      where: {
+        isCompleted: true,
+        seasons: { some: { videos: { some: { isCompleted: false } } } },
+      },
+      data: { isCompleted: false },
+    });
+    // update season isCompleted to false if there is video that is not completed
+    await prisma.season.updateMany({
+      where: {
+        isCompleted: true,
+        videos: { some: { isCompleted: false } },
+      },
+      data: { isCompleted: false },
+    });
+
     const updated = await promisePool(promises, 2);
 
     return NextResponse.json({ data: { updated } });
